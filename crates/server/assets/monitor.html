@@ -1,0 +1,29 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <title>FastDistribution Monitor</title>
+  <style>
+    body { font-family: sans-serif; margin: 24px; }
+    table { border-collapse: collapse; width: 100%; }
+    th, td { border: 1px solid #ddd; padding: 8px; }
+    th { background: #f5f5f5; text-align: left; }
+    .actions { margin-bottom: 16px; }
+  </style>
+</head>
+<body>
+  <div class="actions">
+    <a href="/ui/add">Add new file</a>
+  </div>
+  <h1>Monitor</h1>
+  <table>
+    <thead>
+      <tr><th>Name</th><th>File ID</th><th>Total Bytes</th><th>Clients Reported</th></tr>
+    </thead>
+    <tbody>
+      {{rows}}
+    </tbody>
+  </table>
+</body>
+</html>
+

@@ -739,6 +739,7 @@ dependencies = [
  "axum-server",
  "clap",
  "fast_distribution_core",
+ "serde",
  "tokio",
  "tower-http",
  "tracing",

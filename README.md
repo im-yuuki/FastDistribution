@@ -40,7 +40,6 @@ Fetch current progress for all files:
 ```zsh
 curl -k https://operator.local:12405/api/status
 ```
-```
 
 ## Notes
 

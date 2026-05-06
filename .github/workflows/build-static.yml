@@ -5,6 +5,8 @@ on:
     branches: [ "main", "master" ]
   pull_request:
     branches: [ "main", "master" ]
+  release:
+    types: [ published ]
   workflow_dispatch:
 
 jobs:
@@ -17,26 +19,21 @@ jobs:
         include:
           - os: ubuntu-latest
             target: x86_64-unknown-linux-gnu
-            artifact_suffix: linux-gnu
 #          - os: ubuntu-latest
 #            target: aarch64-unknown-linux-gnu
-#            artifact_suffix: linux-arm64-gnu
           - os: windows-latest
             target: x86_64-pc-windows-msvc
-            artifact_suffix: windows-msvc
           - os: windows-latest
             target: aarch64-pc-windows-msvc
-            artifact_suffix: windows-arm64
           - os: macos-latest
             target: x86_64-apple-darwin
-            artifact_suffix: macos-intel
           - os: macos-latest
             target: aarch64-apple-darwin
-            artifact_suffix: macos-arm64
     steps:
-      - uses: actions/checkout@v4
+      - name: Checkout
+        uses: actions/checkout@v6
 
-      - name: (Linux) Install dependencies
+      - name: Install dependencies (Linux)
         if: matrix.os == 'ubuntu-latest'
         run: |
           sudo apt-get update
@@ -48,7 +45,7 @@ jobs:
           targets: ${{ matrix.target }}
 
       - name: Cache cargo
-        uses: actions/cache@v4
+        uses: actions/cache@v5
         with:
           path: |
             ~/.cargo/registry
@@ -61,15 +58,42 @@ jobs:
       - name: Build (static)
         shell: bash
         env:
-          RUSTFLAGS: ${{ (matrix.target == 'x86_64-pc-windows-msvc' || matrix.target == 'aarch64-pc-windows-msvc') && '-C target-feature=+crt-static' || '' }}
+          RUSTFLAGS: ${{ matrix.os == 'windows-latest' && '-C target-feature=+crt-static' || '' }}
         run: |
           cargo build --release -p fast_distribution_server --target ${{ matrix.target }}
           cargo build --release -p fast_distribution_client --target ${{ matrix.target }}
 
-      - name: Upload artifacts
-        uses: actions/upload-artifact@v4
+      - name: Package (Unix)
+        if: github.event_name == 'release' && matrix.os != 'windows-latest'
+        shell: bash
+        run: |
+          mkdir -p dist
+          tar -czf dist/fast_distribution_${{ matrix.target }}.tar.gz \
+            -C target/${{ matrix.target }}/release \
+            fast_distribution_server fast_distribution_client
+
+      - name: Package (Windows)
+        if: github.event_name == 'release' && matrix.os == 'windows-latest'
+        shell: pwsh
+        run: |
+          New-Item -ItemType Directory -Force dist | Out-Null
+          Compress-Archive -Path @(
+            "target/${{ matrix.target }}/release/fast_distribution_server.exe",
+            "target/${{ matrix.target }}/release/fast_distribution_client.exe"
+          ) -DestinationPath "dist/fast_distribution_${{ matrix.target }}.zip"
+
+      - name: Upload release assets
+        if: github.event_name == 'release'
+        uses: softprops/action-gh-release@v3
         with:
-          name: fast_distribution_${{ matrix.artifact_suffix }}
+          files: dist/*
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+
+      - name: Upload artifacts
+        uses: actions/upload-artifact@v7
+        with:
+          name: fast_distribution_${{ matrix.target }}
           path: |
             target/${{ matrix.target }}/release/fast_distribution_server*
             target/${{ matrix.target }}/release/fast_distribution_client*

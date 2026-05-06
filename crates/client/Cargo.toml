@@ -4,17 +4,12 @@ version.workspace = true
 edition.workspace = true
 
 [dependencies]
-anyhow = "1.0"
-clap = { version = "4.5", features = ["derive"] }
-reqwest = { version = "0.12", features = ["rustls-tls", "json"], default-features = false }
-serde = { version = "1.0", features = ["derive"] }
-serde_json = "1.0"
+anyhow = "1.0.102"
+clap = { version = "4.6.1", features = ["derive"] }
+reqwest = { version = "0.12.28", features = ["rustls-tls", "json"], default-features = false }
 tokio = { version = "1.52.2", features = ["full"] }
-tracing = "0.1"
-tracing-subscriber = "0.3"
+tracing = "0.1.44"
+tracing-subscriber = "0.3.23"
 fast_distribution_core = { path = "../core" }
 librqbit = "8.1.1"
-sha2 = "0.10"
-
-
-
+sha2 = "0.11.0"

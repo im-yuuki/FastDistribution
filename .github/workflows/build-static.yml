@@ -18,9 +18,21 @@ jobs:
           - os: ubuntu-latest
             target: x86_64-unknown-linux-gnu
             artifact_suffix: linux-gnu
+          - os: ubuntu-latest
+            target: aarch64-unknown-linux-gnu
+            artifact_suffix: linux-arm64-gnu
           - os: windows-latest
             target: x86_64-pc-windows-msvc
             artifact_suffix: windows-msvc
+          - os: windows-latest
+            target: aarch64-pc-windows-msvc
+            artifact_suffix: windows-arm64
+          - os: macos-latest
+            target: x86_64-apple-darwin
+            artifact_suffix: macos-intel
+          - os: macos-latest
+            target: aarch64-apple-darwin
+            artifact_suffix: macos-arm64
     steps:
       - uses: actions/checkout@v4
 
@@ -28,6 +40,12 @@ jobs:
         uses: dtolnay/rust-toolchain@stable
         with:
           targets: ${{ matrix.target }}
+
+      - name: Install Linux ARM toolchain
+        if: matrix.target == 'aarch64-unknown-linux-gnu'
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y gcc-aarch64-linux-gnu
 
       - name: Cache cargo
         uses: actions/cache@v4

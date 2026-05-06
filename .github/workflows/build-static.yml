@@ -1,0 +1,54 @@
+name: Build static binaries
+
+on:
+  push:
+    branches: [ "main", "master" ]
+  pull_request:
+    branches: [ "main", "master" ]
+  workflow_dispatch:
+
+jobs:
+  build:
+    name: build-${{ matrix.target }}
+    runs-on: ${{ matrix.os }}
+    strategy:
+      fail-fast: false
+      matrix:
+        include:
+          - os: ubuntu-latest
+            target: x86_64-unknown-linux-musl
+            artifact_suffix: linux-musl
+          - os: windows-latest
+            target: x86_64-pc-windows-msvc
+            artifact_suffix: windows-msvc
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Install Rust
+        uses: dtolnay/rust-toolchain@stable
+        with:
+          targets: ${{ matrix.target }}
+
+      - name: Install musl tools
+        if: matrix.target == 'x86_64-unknown-linux-musl'
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y musl-tools
+
+      - name: Build (static)
+        env:
+          RUSTFLAGS: ${{ matrix.target == 'x86_64-pc-windows-msvc' && '-C target-feature=+crt-static' || '' }}
+        run: |
+          cargo build --release -p fast_distribution_server --target ${{ matrix.target }}
+          cargo build --release -p fast_distribution_client --target ${{ matrix.target }}
+
+      - name: Upload artifacts
+        uses: actions/upload-artifact@v4
+        with:
+          name: fast_distribution_${{ matrix.artifact_suffix }}
+          path: |
+            target/${{ matrix.target }}/release/fast_distribution_server*
+            target/${{ matrix.target }}/release/fast_distribution_client*
+          if-no-files-found: error
+          retention-days: 14
+

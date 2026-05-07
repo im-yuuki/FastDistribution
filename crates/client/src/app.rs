@@ -12,7 +12,7 @@ use tracing::{info, warn};
 pub async fn run(args: Args) -> anyhow::Result<()> {
     tracing_subscriber::fmt::init();
 
-    let client = ControlPlaneClient::new(&args.cert_path)?;
+    let client = ControlPlaneClient::new(args.control_plane_url.clone(), &args.cert_path)?;
     let session = Session::new(args.download_dir.clone()).await?;
     let mut torrents: HashMap<String, TorrentRuntime> = HashMap::new();
 
@@ -55,4 +55,3 @@ pub async fn run(args: Args) -> anyhow::Result<()> {
         tokio::time::sleep(Duration::from_secs(poll.next_poll_seconds)).await;
     }
 }
-

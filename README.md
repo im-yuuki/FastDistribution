@@ -25,7 +25,7 @@ cargo run -p fast_distribution_server -- --bind 0.0.0.0:12405 --tls-cert certifi
 Run a client:
 
 ```zsh
-cargo run -p fast_distribution_client -- --client-id client-1 --cert-path certificate.crt --download-dir downloads
+cargo run -p fast_distribution_client -- --client-id client-1 --cert-path certificate.crt --download-dir downloads --control-plane-url https://operator.local:12405
 ```
 
 Add a file from another terminal:
@@ -47,6 +47,3 @@ curl -k https://operator.local:12405/api/status
 - Progress reporting includes both torrent state and on-disk file state.
 - The client uses `librqbit` to manage torrents and report live progress.
 - SHA-256 checksums are verified once per file when a checksum is provided.
-
-
-

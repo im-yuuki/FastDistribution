@@ -8,7 +8,8 @@ pub struct Args {
     pub cert_path: String,
     #[arg(long, default_value = "client-1")]
     pub client_id: String,
+    #[arg(long, default_value = "https://operator.local:12405")]
+    pub control_plane_url: String,
     #[arg(long, default_value = "downloads")]
     pub download_dir: PathBuf,
 }
-

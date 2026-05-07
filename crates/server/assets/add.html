@@ -6,22 +6,20 @@
   <style>
     body { font-family: sans-serif; margin: 24px; }
     label { display: block; margin-top: 12px; }
-    input, textarea { width: 100%; padding: 8px; }
+    input { width: 100%; padding: 8px; }
     .actions { margin-top: 16px; }
   </style>
 </head>
 <body>
   <a href="/ui">Back to monitor</a>
-  <h1>Add new file</h1>
-  <form method="post" action="/ui/add">
+  <h1>Upload new file</h1>
+  <form method="post" action="/ui/add" enctype="multipart/form-data">
     <label>File name<input name="file_name" required /></label>
-    <label>Magnet link<textarea name="magnet_link" rows="4" required></textarea></label>
-    <label>Total bytes<input name="total_bytes" type="number" min="1" required /></label>
+    <label>File<input name="file" type="file" required /></label>
     <label>Checksum hex (optional)<input name="checksum_hex" /></label>
     <div class="actions">
-      <button type="submit">Add file</button>
+      <button type="submit">Upload &amp; create torrent</button>
     </div>
   </form>
 </body>
 </html>
-
